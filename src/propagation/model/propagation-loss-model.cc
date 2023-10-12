@@ -695,6 +695,22 @@ LogDistanceShadowingPropagationLossModel::GetTypeId()
     return tid;
 }
 
+
+LogDistanceShadowingPropagationLossModel::LogDistanceShadowingPropagationLossModel()
+{
+}
+
+void LogDistanceShadowingPropagationLossModel::SetPathLossExponent(double n)
+{
+    m_exponent = n;
+}
+
+void LogDistanceShadowingPropagationLossModel::SetReference(double referenceDistance, double referenceLoss)
+{
+    m_referenceDistance = referenceDistance;
+    m_referenceLoss = referenceLoss;
+}
+
 // ------------------------------------------------------------------------- //
 
 NS_OBJECT_ENSURE_REGISTERED(NakagamiPropagationLossModel);
