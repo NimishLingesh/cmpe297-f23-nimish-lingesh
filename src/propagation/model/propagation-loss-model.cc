@@ -711,6 +711,52 @@ void LogDistanceShadowingPropagationLossModel::SetReference(double referenceDist
     m_referenceLoss = referenceLoss;
 }
 
+
+
+double
+LogDistanceShadowingPropagationLossModel::GetPathLossExponent() const
+{
+    return m_exponent;
+}
+
+double
+LogDistancePropagationLossModel::DoCalcRxPower(double txPowerDbm,
+                                               Ptr<MobilityModel> a,
+                                               Ptr<MobilityModel> b) const
+{
+    double distance = a->GetDistanceFrom(b);
+    if (distance <= m_referenceDistance)
+    {
+        return txPowerDbm - m_referenceLoss;
+    }
+    /**
+     * The formula is:
+     * rx = 10 * log (Pr0(tx)) - n * 10 * log (d/d0)
+     *
+     * Pr0: rx power at reference distance d0 (W)
+     * d0: reference distance: 1.0 (m)
+     * d: distance (m)
+     * tx: tx power (dB)
+     * rx: dB
+     *
+     * Which, in our case is:
+     *
+     * rx = rx0(tx) - 10 * n * log (d/d0)
+     */
+    double pathLossDb = 10 * m_exponent * std::log10(distance / m_referenceDistance);
+    double rxc = -m_referenceLoss - pathLossDb;
+    NS_LOG_DEBUG("distance=" << distance << "m, reference-attenuation=" << -m_referenceLoss
+                             << "dB, "
+                             << "attenuation coefficient=" << rxc << "db");
+    return txPowerDbm + rxc;
+}
+
+int64_t
+LogDistancePropagationLossModel::DoAssignStreams(int64_t stream)
+{
+    return 0;
+}
+
 // ------------------------------------------------------------------------- //
 
 NS_OBJECT_ENSURE_REGISTERED(NakagamiPropagationLossModel);
